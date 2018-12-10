@@ -4,9 +4,10 @@ import time as tm
 import uncertainties as unc
 import uncertainties.umath
 from uncertainties import unumpy as unp
+import nicenquickplotlib as nq # https://github.com/SengerM/nicenquickplotlib
 
 import lib.HP3458A as HP3458A
-import nicenquickplotlib as nq
+import lib.fitmodel as fitmodel
 
 # Script parameters ----------------------------------------------------
 RESET_INSTRUMENTS = False
@@ -131,6 +132,20 @@ FunGen.write('TERM OFF') # Disconnect the output from all terminals.
 FunGen.write('USE CHANB') # Select channel B to receive subsequent commands.
 FunGen.write('TERM OFF') # Disconnect the output from all terminals.
 FunGen.close()
+print('Processing data...')
+# Process data ---------------------------------------------------------
+def discrete_time_modeling_function(n, p):
+	Vp = p[0]
+	phi = p[1]
+	Vos = p[2]
+	return Vp*unp.sin(2*np.pi*GENERATOR_FREQUENCY/SAMPLING_FREQUENCY*n + phi) + Vos
+discrete_time_model = [None]*len(samples)
+for k in range(len(samples)):
+	discrete_time_model[k] = fitmodel.fitmodel(discrete_time_modeling_function, r'$V_p \sin \left(\frac{\omega}{f_s} n + \phi \right) + V_{os}$', [r'$V_p$', r'$\phi$', r'$V_{os}$', ], 'discrete time fit ' + str(k+1))
+	discrete_time_model[k].set_data(np.arange(len(samples[k])), samples[k])
+	discrete_time_model[k].fit([GENERATOR_AMPLITUDE, 0, 0])
+	discrete_time_model[k].plot_model_vs_data(xlabel='Sample number', ylabel='Voltage')
+	discrete_time_model[k].plot_residuals(xlabel='Sample number', ylabel='Voltage')
 
 nq.plot(samples, legend=['samples 1', 'samples 2'], xlabel='Sample number', ylabel='Voltage (V)')
 
