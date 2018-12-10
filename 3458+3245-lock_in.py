@@ -1,14 +1,20 @@
 import visa
 import numpy as np
 import time as tm
+import uncertainties as unc
+import uncertainties.umath
+from uncertainties import unumpy as unp
+
+import lib.HP3458A as HP3458A
+import nicenquickplotlib as nq
 
 # Script parameters ----------------------------------------------------
 RESET_INSTRUMENTS = False
 SAVE_DATA = True
 # MEASURING PARAMS -----------------------------------------------------
-GENERATOR_FREQUENCY = 1000 # Hertz.
-SAMPLING_FREQUENCY = GENERATOR_FREQUENCY*10 # Hertz.
-SAMPLES_PER_BURST = 10200 # Number of samples to be recorded.
+GENERATOR_FREQUENCY = 237 # Hertz.
+SAMPLING_FREQUENCY = 20000 # Hertz.
+SAMPLES_PER_BURST = 1000 # Number of samples to be recorded.
 GENERATOR_AMPLITUDE = 1 # Peak voltage.
 N_BURSTS = 1 # See note below.
 DIVIDER_RATIO = 7.4/10
@@ -102,8 +108,8 @@ def measure_burst(FunGen=None, DMM=None, generator_frequency=100, generator_ampl
 print('Opening instruments...')
 rm = visa.ResourceManager()
 DMM = [None]*2
-DMM[0] = rm.open_resource('GPIB0::22::INSTR') # HP3458A multimeter.
-DMM[1] = rm.open_resource('GPIB0::23::INSTR') # HP3458A multimeter.
+DMM[0] = rm.open_resource('GPIB0::21::INSTR') # HP3458A multimeter. High voltage side DMM.
+DMM[1] = rm.open_resource('GPIB0::22::INSTR') # HP3458A multimeter. Low voltage side DMM.
 FunGen = rm.open_resource('GPIB0::9::INSTR') # HP3254A universal source.
 if RESET_INSTRUMENTS is True:
 	for k in range(len(DMM)):
@@ -111,11 +117,10 @@ if RESET_INSTRUMENTS is True:
 	FunGen.write('RESET')
 	print('Instruments have been reset.')
 for k in range(len(DMM)):
-	DMM[k].read_termination = '\r'
-FunGen.read_termination = '\r'
+	DMM[k].read_termination = HP3458A.read_termination
+FunGen.read_termination = HP3458A.read_termination
 # Measure --------------------------------------------------------------
 samples = measure_burst(FunGen=FunGen, DMM=DMM, generator_frequency=GENERATOR_FREQUENCY, generator_amplitude=GENERATOR_AMPLITUDE, sampling_frequency=SAMPLING_FREQUENCY, number_of_samples=SAMPLES_PER_BURST, verbose=True)
-print(samples)
 # Close instruments ----------------------------------------------------
 print('Closing instruments...')
 for k in range(len(DMM)):
@@ -127,4 +132,7 @@ FunGen.write('USE CHANB') # Select channel B to receive subsequent commands.
 FunGen.write('TERM OFF') # Disconnect the output from all terminals.
 FunGen.close()
 
+nq.plot(samples, legend=['samples 1', 'samples 2'], xlabel='Sample number', ylabel='Voltage (V)')
 
+nq.save_all(timestamp=True, csv=True)
+nq.show()
