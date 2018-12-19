@@ -6,8 +6,8 @@ import uncertainties.umath
 from uncertainties import unumpy as unp
 import nicenquickplotlib as nq # https://github.com/SengerM/nicenquickplotlib
 
-import lib.HP3458A as HP3458A
-import lib.fitmodel as fitmodel
+import asd.HP3458A as HP3458A
+import asd.fitmodel as fitmodel
 
 # Script parameters ----------------------------------------------------
 RESET_INSTRUMENTS = True
