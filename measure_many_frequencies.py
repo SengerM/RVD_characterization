@@ -11,10 +11,9 @@ import asd.fitmodel as fitmodel
 
 # Script parameters ----------------------------------------------------
 RESET_INSTRUMENTS = False
-SAVE_DATA = True
 # MEASURING PARAMS -----------------------------------------------------
-GENERATOR_FREQUENCIES = [60, 100] #, 300, 400, 700, 1000, 3000, 4000, 5000]
-SAMPLING_FREQUENCIES =  [60*10, 100*10] #, 300*10, 400*10, 700*10, 1000*10, 3000*10, 4000*10, 5000*10]
+GENERATOR_FREQUENCIES = [60, 100, 300, 400, 700, 1000, 3000, 4000, 5000]
+SAMPLING_FREQUENCIES =  [60*10, 100*10, 300*10, 400*10, 700*10, 1000*10, 3000*10, 4000*10, 5000*10]
 SAMPLES_PER_BURST = 10200 # Number of samples to be recorded.
 GENERATOR_AMPLITUDE = 10 # Peak voltage.
 N_BURSTS = 1 # See note below.
@@ -104,7 +103,6 @@ def measure_burst(FunGen=None, DMM=None, generator_frequency=100, generator_ampl
 		samples[k] = unp.uarray(samples[k], [s*uncertainty[0]+uncertainty[1] for s in np.abs(samples[k])])
 	return samples
 
-
 # Open instruments -----------------------------------------------------
 print('Opening instruments...')
 rm = visa.ResourceManager()
@@ -134,22 +132,6 @@ FunGen.write('TERM OFF') # Disconnect the output from all terminals.
 FunGen.write('USE CHANB') # Select channel B to receive subsequent commands.
 FunGen.write('TERM OFF') # Disconnect the output from all terminals.
 FunGen.close()
-# ~ # Process data ---------------------------------------------------------
-# ~ print('Processing data...')
-# ~ def discrete_time_modeling_function(n, p):
-	# ~ Vp = p[0]
-	# ~ phi = p[1]
-	# ~ Vos = p[2]
-	# ~ return Vp*unp.sin(2*np.pi*GENERATOR_FREQUENCY/SAMPLING_FREQUENCY*n + phi) + Vos
-# ~ discrete_time_model = [None]*len(samples)
-# ~ for k in range(len(samples)):
-	# ~ discrete_time_model[k] = fitmodel.fitmodel(discrete_time_modeling_function, r'$V_p \sin \left(\frac{\omega}{f_s} n + \phi \right) + V_{os}$', [r'$V_p$', r'$\phi$', r'$V_{os}$', ], 'discrete time fit ' + str(k+1))
-	# ~ discrete_time_model[k].set_data(np.arange(len(samples[k])), samples[k])
-	# ~ discrete_time_model[k].fit([GENERATOR_AMPLITUDE, 0, 0])
-	# ~ discrete_time_model[k].plot_model_vs_data(xlabel='Sample number', ylabel='Voltage')
-	# ~ discrete_time_model[k].plot_residuals(xlabel='Sample number', ylabel='Voltage')
-
-# ~ nq.plot(samples, legend=['samples 1', 'samples 2'], xlabel='Sample number', ylabel='Voltage (V)')
-
+print('Saving data...')
 nq.save_all(timestamp=True, csv=True)
-# ~ nq.show()
+print('Finished!')
