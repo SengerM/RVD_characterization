@@ -10,7 +10,7 @@ import lib.HP3458A as HP3458A
 import lib.fitmodel as fitmodel
 
 # Script parameters ----------------------------------------------------
-RESET_INSTRUMENTS = False
+RESET_INSTRUMENTS = True
 SAVE_DATA = True
 # MEASURING PARAMS -----------------------------------------------------
 GENERATOR_FREQUENCY = 237 # Hertz.
