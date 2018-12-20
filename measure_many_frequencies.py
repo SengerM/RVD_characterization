@@ -6,8 +6,10 @@ import uncertainties.umath
 from uncertainties import unumpy as unp
 import nicenquickplotlib as nq # https://github.com/SengerM/nicenquickplotlib
 
-import asd.HP3458A as HP3458A
-import asd.fitmodel as fitmodel
+import utils.HP3458A as HP3458A
+import utils.fitmodel as fitmodel
+import directories as DIRS
+import utils.timestamp
 
 # Script parameters ----------------------------------------------------
 RESET_INSTRUMENTS = False
@@ -120,8 +122,15 @@ for k in range(len(DMM)):
 FunGen.read_termination = HP3458A.read_termination
 # Measure --------------------------------------------------------------
 for k in range(len(GENERATOR_FREQUENCIES)):
+	timestamp = utils.timestamp.generate_timestamp()
 	samples = measure_burst(FunGen=FunGen, DMM=DMM, generator_frequency=GENERATOR_FREQUENCIES[k], generator_amplitude=GENERATOR_AMPLITUDE, sampling_frequency=SAMPLING_FREQUENCIES[k], number_of_samples=SAMPLES_PER_BURST, verbose=True)
-	nq.plot(samples, legend=['samples 1', 'samples 2'], xlabel='Sample number', ylabel='Voltage (V)')
+	with open(DIRS.UNPROCESSED_DATA_PATH + timestamp + DIRS.CONFIG_FILE_SUFFIX, 'w') as ofile:
+		print('Generator frequency (Hz)\tSampling frequency (Hz)\tGenerator amplitude (V)', file=ofile)
+		print(str(GENERATOR_FREQUENCIES[k]) + '\t' + str(SAMPLING_FREQUENCIES[k]) + '\t' + str(GENERATOR_AMPLITUDE), file=ofile)
+	with open(DIRS.UNPROCESSED_DATA_PATH + timestamp + DIRS.SAMPLES_FILE_SUFFIX, 'w') as ofile:
+		print('Samples1 (V)\tSamples2 (V)', file=ofile)
+		for k in range(len(samples[0])):
+			print(str(samples[0][k].n) + '\t' + str(samples[1][k].n), file=ofile)
 # Close instruments ----------------------------------------------------
 print('Closing instruments...')
 for k in range(len(DMM)):

@@ -104,3 +104,4 @@ venv.bak/
 .mypy_cache/
 
 figures
+current_measurement

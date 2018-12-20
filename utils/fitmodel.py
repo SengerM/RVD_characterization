@@ -148,7 +148,7 @@ class fitmodel:
 			data_str += self.str_params[k] + r'$=$' + munc.ufloat_nice_str(self._params[k]) + '\n'
 		axes.text(x_pos, y_pos, data_str, transform=axes.transAxes, verticalalignment='top', bbox=BBOX)
 	
-	def plot_model_vs_data(self, *args, **kwargs):
+	def plot_model_vs_data(self, nicebox=False, *args, **kwargs):
 		"""
 		Plotea en un gráfico los datos (x,y) cargados en el modelo, superpuestos con el
 		modelo (previamente ajustado) evaluado en los valores de xdata cargados.
@@ -160,7 +160,10 @@ class fitmodel:
 				xdata = unp.nominal_values(self._xdata)
 			else:
 				xdata = self._xdata
-			nq.plot(xdata, [self._ydata, self.eval(xdata)], legend=['Data', 'Fit'], linestyle=['-','--'], title=self.name, *args, **kwargs)
+		fig = nq.plot(xdata, [self._ydata, self.eval(xdata)], legend=['Data', 'Fit'], linestyle=['-','--'], title=self.name, *args, **kwargs)
+		if nicebox is True:
+			self.print_nice_box(fig.axes[0])
+		return fig
 	
 	def plot_residuals(self, *args, **kwargs):
 		"""
