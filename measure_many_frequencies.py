@@ -143,4 +143,3 @@ FunGen.write('TERM OFF') # Disconnect the output from all terminals.
 FunGen.close()
 print('Saving data...')
 nq.save_all(timestamp=True, csv=True)
-print('Finished!')

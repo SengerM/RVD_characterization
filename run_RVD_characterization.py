@@ -5,7 +5,7 @@ from time import sleep
 import directories as DIRS
 
 N_SIMULTANEOUS_PROCESSING_THREADS = 4
-N_MEASUREMENT_RUNS = 20
+N_MEASUREMENT_RUNS = 2
 
 def call_processing_script():
 	print('Calling "process_data.py"')
@@ -38,7 +38,7 @@ def process_data(measuring_thread):
 	while True: # Check that all data has been processed.
 		for k in range(len(processing_threads)):
 			if processing_threads[k].isAlive() is False:
-				del processing_threads[k]
+				processing_threads.pop(k)
 		if len(processing_threads) == 0:
 			print('Thread: ' + threading.current_thread().getName() + ' --> Processing finished')
 			return

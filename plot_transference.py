@@ -86,4 +86,4 @@ nq.plot(x=freq,
 	marker='.'
 	)
 nq.save_all(mkdir=DIRS.TRANSFERENCE_RESULTS_PATH, csv=True)
-nq.show()
+print('Transference has been plotted and data was saved in ' + DIRS.TRANSFERENCE_RESULTS_PATH)
