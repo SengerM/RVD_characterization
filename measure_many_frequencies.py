@@ -14,8 +14,8 @@ import utils.timestamp
 # Script parameters ----------------------------------------------------
 RESET_INSTRUMENTS = False
 # MEASURING PARAMS -----------------------------------------------------
-GENERATOR_FREQUENCIES = [60, 100, 300, 400, 700, 1000, 3000, 4000, 5000]
-SAMPLING_FREQUENCIES =  [60*10, 100*10, 300*10, 400*10, 700*10, 1000*10, 3000*10, 4000*10, 5000*10]
+GENERATOR_FREQUENCIES = [1000, 3000, 4000, 5000] # [60, 100, 300, 400, 700, 1000, 3000, 4000, 5000]
+SAMPLING_FREQUENCIES =  [1000*10, 3000*10, 4000*10, 5000*10] # [60*10, 100*10, 300*10, 400*10, 700*10, 1000*10, 3000*10, 4000*10, 5000*10]
 SAMPLES_PER_BURST = 10200 # Number of samples to be recorded.
 GENERATOR_AMPLITUDE = 10 # Peak voltage.
 N_BURSTS = 1 # See note below.
