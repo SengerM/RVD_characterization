@@ -5,7 +5,10 @@ from time import sleep
 import directories as DIRS
 
 N_SIMULTANEOUS_PROCESSING_THREADS = 4
-N_MEASUREMENT_RUNS = 1
+N_MEASUREMENT_RUNS = 20
+
+def call_processing_script():
+	os.system("start /wait cmd /c python process_data.py")
 
 def measure(n_runs=1):
 	if not isinstance(n_runs, int) or n_runs < 1:
@@ -14,30 +17,37 @@ def measure(n_runs=1):
 		print('Thread: ' + threading.current_thread().getName() + ' --> # of runs left = ' + str(n_runs))
 		os.system("start /wait cmd /c python measure_many_frequencies.py")
 		n_runs -= 1
-	print('Measurements finished!')
+	print('Thread: ' + threading.current_thread().getName() + ' --> Measurements finished!')
 
-def process_data():
-	os.system("start /wait cmd /c python while_true_process_data.py")
-
-def status(measuring_thread):
-	while True:
-		if measuring_thread.isAlive() is False:
-			if len(os.listdir(DIRS.UNPROCESSED_DATA_PATH)) == 0: # This means that there is data awaiting to be processed.
-				print('Thread: ' + threading.current_thread().getName() + ' --> Waiting 60 seconds to finish processing...')
-				sleep(60)
-				print('Thread: ' + threading.current_thread().getName() + ' --> Everything is done!')
-				return
+def process_data(measuring_thread):
+	processing_threads = []
+	while measuring_thread.isAlive() is True or len(os.listdir(DIRS.UNPROCESSED_DATA_PATH)) > 0:
+		if len(os.listdir(DIRS.UNPROCESSED_DATA_PATH)) > 0: # This means there is data awaiting to be processed.
+			if len(processing_threads) < N_SIMULTANEOUS_PROCESSING_THREADS:
+				processing_threads.append(threading.Thread(target=call_processing_script))
+				processing_threads[-1].start()
+			else:
+				for k in range(len(processing_threads)):
+					if processing_threads[k].isAlive() is False: # This means that this thread is available to process new data.
+						processing_threads[k] = threading.Thread(target=call_processing_script)
+						processing_threads[k].start()
 		sleep(1)
+	while True: # Check that all data has been processed.
+		for k in range(len(processing_threads)):
+			if processing_threads[k].isAlive() is False:
+				del processing_threads[k]
+		if len(processing_threads) == 0:
+			print('Thread: ' + threading.current_thread().getName() + ' --> Processing finished')
+			return
 
 measuring_thread = threading.Thread(target=measure, name='measuring', args=(N_MEASUREMENT_RUNS,))
-status_thread = threading.Thread(target=status, name='status', args=(measuring_thread,))
-processing_threads = []
-for k in range(N_SIMULTANEOUS_PROCESSING_THREADS):
-	processing_threads.append(threading.Thread(target=process_data, name='process_data #'+str(k), daemon=True))
+data_processing_thread = threading.Thread(target=process_data, name='data processing', args=(measuring_thread,))
 
-print('Running measurements...')
 measuring_thread.start()
-print('Running processing...')
-for k in range(N_SIMULTANEOUS_PROCESSING_THREADS):
-	processing_threads[k].start()
-status_thread.start()
+data_processing_thread.start()
+print('Measuring and processing data...')
+while data_processing_thread.isAlive() is True:
+	sleep(1)
+os.system("start /wait cmd /c python plot_transference.py")
+
+
