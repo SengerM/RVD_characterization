@@ -84,5 +84,5 @@ nq.plot(x=freq,
 	title='Transference uncertainties',
 	marker='.'
 	)
-nq.save_all(mkdir=DIRS.CURRENT_MEASUREMENT_PATH + 'transference_data', csv=True)
+nq.save_all(mkdir=DIRS.TRANSFERENCE_RESULTS_PATH, csv=True)
 nq.show()

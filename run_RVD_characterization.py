@@ -4,18 +4,20 @@ from time import sleep
 
 import directories as DIRS
 
-N_SIMULTANEOUS_PROCESSING_THREADS = 4
+N_SIMULTANEOUS_PROCESSING_THREADS = 3
 N_MEASUREMENT_RUNS = 20
 
 def call_processing_script():
-	os.system("start /wait cmd /c python process_data.py")
+	print('Calling "process_data.py"')
+	os.system("python process_data.py")
 
 def measure(n_runs=1):
 	if not isinstance(n_runs, int) or n_runs < 1:
 		raise TypeError('"n_runs" must be a positive integer number')
 	while n_runs > 0:
 		print('Thread: ' + threading.current_thread().getName() + ' --> # of runs left = ' + str(n_runs))
-		os.system("start /wait cmd /c python measure_many_frequencies.py")
+		# ~ os.system("start /wait cmd /c python measure_many_frequencies.py")
+		os.system("python measure_many_frequencies.py")
 		n_runs -= 1
 	print('Thread: ' + threading.current_thread().getName() + ' --> Measurements finished!')
 
@@ -48,6 +50,7 @@ data_processing_thread.start()
 print('Measuring and processing data...')
 while data_processing_thread.isAlive() is True:
 	sleep(1)
-os.system("start /wait cmd /c python plot_transference.py")
+print('Processing transference data...')
+os.system("python plot_transference.py")
 
 
