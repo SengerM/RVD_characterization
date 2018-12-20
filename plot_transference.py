@@ -76,11 +76,12 @@ nq.plot(x=freq,
 	marker='.'
 	)
 nq.plot(x=freq, 
-	y=[unp.std_devs(T_abs_definitive)*1e6, unp.std_devs(T_phi_definitive)*1e6],
+	y=[unp.std_devs(T_abs_definitive)/unp.nominal_values(T_abs_definitive), np.abs(unp.std_devs(T_phi_definitive)/unp.nominal_values(T_phi_definitive))],
 	together=False,
 	xlabel='Frequency (Hz)',
-	ylabel=[r'Ratio err $\mu$V / V', r'Phase err $\mu$rad'],
+	ylabel=[r'Ratio err $\frac{\sigma}{\mu}$', r'Phase err $\frac{\sigma}{\mu}$'],
 	xscale='L',
+	yscale='L',
 	title='Transference uncertainties',
 	marker='.'
 	)

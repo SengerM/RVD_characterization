@@ -29,4 +29,5 @@ for k in range(len(MEASUREMENTS_TO_COMPARE)):
 
 nq.plot(freqs, ratios, xscale='L', marker='.', legend=LABELS, xlabel='Frequency (Hz)', ylabel='Ratio')
 nq.plot(freqs, phases, xscale='L', marker='.', legend=LABELS, xlabel='Frequency (Hz)', ylabel='Phase (rad)')
+nq.save_all()
 nq.show()

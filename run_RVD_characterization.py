@@ -4,7 +4,7 @@ from time import sleep
 
 import directories as DIRS
 
-N_SIMULTANEOUS_PROCESSING_THREADS = 3
+N_SIMULTANEOUS_PROCESSING_THREADS = 4
 N_MEASUREMENT_RUNS = 20
 
 def call_processing_script():
@@ -33,6 +33,7 @@ def process_data(measuring_thread):
 					if processing_threads[k].isAlive() is False: # This means that this thread is available to process new data.
 						processing_threads[k] = threading.Thread(target=call_processing_script)
 						processing_threads[k].start()
+					sleep(1) # This is to avoid two threads tying to process the same data.
 		sleep(1)
 	while True: # Check that all data has been processed.
 		for k in range(len(processing_threads)):
