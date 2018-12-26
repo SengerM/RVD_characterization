@@ -3,6 +3,7 @@ import struct # This is used in parsing bynary data.
 
 reading_memory_bytes = 20480 # This number is returned by command 'MSIZE?'.
 read_termination = '\r'
+MAXIMUM_SAMPLING_FREQUENCY_IN_DIRECT_SAMPLING_MODE = 50000 # Samples per second.
 
 def configure_sub_sampling(HP3458A, samples_per_burst, effective_sampling_frequency, max_input=1000):
 	HP3458A.write('PRESET FAST') # Configures the multimeter for fast readings, fast transfer to memory, and fast GPIB (see [1], page 218).

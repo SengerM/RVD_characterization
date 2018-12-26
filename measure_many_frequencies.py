@@ -14,8 +14,8 @@ import utils.timestamp
 # Script parameters ----------------------------------------------------
 RESET_INSTRUMENTS = False
 # MEASURING PARAMS -----------------------------------------------------
-GENERATOR_FREQUENCIES = [60, 100, 300, 400, 700, 1000, 3000, 4000, 5000]
-SAMPLING_FREQUENCIES =  [60*10, 100*10, 300*10, 400*10, 700*10, 1000*10, 3000*10, 4000*10, 5000*10]
+GENERATOR_FREQUENCIES = [40, 100, 400, 1000, 4000, 10000, 40000, 100000]
+SAMPLING_FREQUENCIES =  [i*10 for i in GENERATOR_FREQUENCIES]
 SAMPLES_PER_BURST = 10200 # Number of samples to be recorded.
 GENERATOR_AMPLITUDE = 10 # Peak voltage.
 N_BURSTS = 1 # See note below.
@@ -57,6 +57,22 @@ def measure_burst(FunGen=None, DMM=None, generator_frequency=100, generator_ampl
 	FunGen.write('SYNCOUT OFF') # The sync signal is output only from the front panel.
 	FunGen.write('ARANGE ON') # Enable autorange.
 	FunGen.write('APPLY ACV 1')
+	if sampling_frequency > HP3458A.MAXIMUM_SAMPLING_FREQUENCY_IN_DIRECT_SAMPLING_MODE: # Subsampling mode...
+		if verbose:
+			print('Subsampling mode enabled')
+		aparent_sampling_frequency = 0
+		k = 0
+		while aparent_sampling_frequency < sampling_frequency:
+			k = k + 1
+			aparent_sampling_frequency = generator_frequency*k
+		l = 0
+		while sampling_frequency > HP3458A.MAXIMUM_SAMPLING_FREQUENCY_IN_DIRECT_SAMPLING_MODE:
+			l = l + 1
+			sampling_frequency = generator_frequency/(l+1/k)
+		print('Sampling frequency = ' + str(sampling_frequency))
+		print('Aparent sampling frequency = ' + str(aparent_sampling_frequency))
+	else: # No subsampling mode case...
+		aparent_sampling_frequency = sampling_frequency
 	FunGen.write('FREQ ' + str(sampling_frequency))
 	FunGen.write('TERM FRONT') # Connect the output to the front panel terminal (i.e. enable output).
 	FunGen.write('PHSYNC') # Synchronize channels.
@@ -106,7 +122,7 @@ def measure_burst(FunGen=None, DMM=None, generator_frequency=100, generator_ampl
 		samples[k] = HP3458A.read_binary_mem(DMM[k], number_of_samples)
 		uncertainty = HP3458A.get_uncertainty(DMM[k])
 		samples[k] = unp.uarray(samples[k], [s*uncertainty[0]+uncertainty[1] for s in np.abs(samples[k])])
-	return samples
+	return samples, aparent_sampling_frequency
 
 # Open instruments -----------------------------------------------------
 print('Opening instruments...')
@@ -126,10 +142,10 @@ FunGen.read_termination = HP3458A.read_termination
 # Measure --------------------------------------------------------------
 for k in range(len(GENERATOR_FREQUENCIES)):
 	timestamp = utils.timestamp.generate_timestamp()
-	samples = measure_burst(FunGen=FunGen, DMM=DMM, generator_frequency=GENERATOR_FREQUENCIES[k], generator_amplitude=GENERATOR_AMPLITUDE, sampling_frequency=SAMPLING_FREQUENCIES[k], number_of_samples=SAMPLES_PER_BURST, verbose=True)
+	samples, sampling_frequency = measure_burst(FunGen=FunGen, DMM=DMM, generator_frequency=GENERATOR_FREQUENCIES[k], generator_amplitude=GENERATOR_AMPLITUDE, sampling_frequency=SAMPLING_FREQUENCIES[k], number_of_samples=SAMPLES_PER_BURST, verbose=True)
 	with open(DIRS.UNPROCESSED_DATA_PATH + timestamp + DIRS.CONFIG_FILE_SUFFIX, 'w') as ofile:
 		print('Generator frequency (Hz)\tSampling frequency (Hz)\tGenerator amplitude (V)', file=ofile)
-		print(str(GENERATOR_FREQUENCIES[k]) + '\t' + str(SAMPLING_FREQUENCIES[k]) + '\t' + str(GENERATOR_AMPLITUDE), file=ofile)
+		print(str(GENERATOR_FREQUENCIES[k]) + '\t' + str(sampling_frequency) + '\t' + str(GENERATOR_AMPLITUDE), file=ofile)
 	with open(DIRS.UNPROCESSED_DATA_PATH + timestamp + DIRS.SAMPLES_FILE_SUFFIX, 'w') as ofile:
 		print('Samples1 (V)\tSamples2 (V)', file=ofile)
 		for k in range(len(samples[0])):

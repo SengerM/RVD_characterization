@@ -8,11 +8,17 @@ MEASUREMENTS_TO_COMPARE = [
 	'../RVD_measurements/181220C',
 	'../RVD_measurements/181221A',
 	'../RVD_measurements/181221B',
+	# ~ '../RVD_measurements/181226A',
+	'../RVD_measurements/181226B',
+	'../RVD_measurements/181226C',
 	]
 LABELS = [
 	'181220C',
 	'181221A',
 	'181221B',
+	# ~ '181226A',
+	'181226B',
+	'181226C',
 	]
 
 freqs = []
