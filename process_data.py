@@ -44,7 +44,7 @@ for k in range(2):
 	fig = discrete_time_model[k].plot_model_vs_data(xlabel='Sample number', ylabel='Voltage (V)', nicebox=True, marker='.')
 	fig.axes[-1].set_xlim([0, 10*sampling_frequency/2/np.pi/generator_frequency])
 # Transference calculation ---------------
-T_abs = discrete_time_model[1].param_val(0)/discrete_time_model[0].param_val(0)
+T_abs = np.abs(discrete_time_model[1].param_val(0)/discrete_time_model[0].param_val(0)) # The "abs" is because sometimes the fitting process converges to a negative amplitude.
 T_phi = utils.lock_in_process.lock_in_process(samples[0], samples[1])
 # Save data ------------------------------
 os.rename(DIRS.CURRENTLY_PROCESSING_DATA_PATH + current_timestamp + DIRS.CONFIG_FILE_SUFFIX, DIRS.PROCESSED_DATA_PATH + current_timestamp + DIRS.CONFIG_FILE_SUFFIX)
