@@ -5,14 +5,14 @@ import uncertainties as unc
 import directories as DIRS
 
 MEASUREMENTS_TO_COMPARE = [
-	'../RVD_measurements/181219',
-	'../RVD_measurements/181220A',
-	'current_measurement'
+	'../RVD_measurements/181220C',
+	'../RVD_measurements/181221A',
+	'../RVD_measurements/181221B',
 	]
 LABELS = [
-	'181219',
-	'181220A',
-	'Current'
+	'181220C',
+	'181221A',
+	'181221B',
 	]
 
 freqs = []

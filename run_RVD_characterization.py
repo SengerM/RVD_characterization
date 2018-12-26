@@ -5,7 +5,7 @@ from time import sleep
 import directories as DIRS
 
 N_SIMULTANEOUS_PROCESSING_THREADS = 4
-N_MEASUREMENT_RUNS = 2
+N_MEASUREMENT_RUNS = 20
 
 def call_processing_script():
 	print('Calling "process_data.py"')
