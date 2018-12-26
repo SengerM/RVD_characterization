@@ -14,8 +14,8 @@ import utils.timestamp
 # Script parameters ----------------------------------------------------
 RESET_INSTRUMENTS = False
 # MEASURING PARAMS -----------------------------------------------------
-GENERATOR_FREQUENCIES = [60, 100, 300, 400, 700, 1000, 3000, 4000, 5000]
-SAMPLING_FREQUENCIES =  [60*10, 100*10, 300*10, 400*10, 700*10, 1000*10, 3000*10, 4000*10, 5000*10]
+GENERATOR_FREQUENCIES = [1000]#[60, 100, 300, 400, 700, 1000, 3000, 4000, 5000]
+SAMPLING_FREQUENCIES =  [10000]#[60*10, 100*10, 300*10, 400*10, 700*10, 1000*10, 3000*10, 4000*10, 5000*10]
 SAMPLES_PER_BURST = 10200 # Number of samples to be recorded.
 GENERATOR_AMPLITUDE = 10 # Peak voltage.
 N_BURSTS = 1 # See note below.
@@ -54,14 +54,12 @@ def measure_burst(FunGen=None, DMM=None, generator_frequency=100, generator_ampl
 	# Configure trigger generator --------------------------------------
 	FunGen.write('USE CHANB') # Select channel B to receive subsequent commands.
 	FunGen.write('TERM OFF') # Disconnect the output from all terminals.
+	FunGen.write('SYNCOUT OFF') # The sync signal is output only from the front panel.
 	FunGen.write('ARANGE ON') # Enable autorange.
 	FunGen.write('APPLY ACV 1')
 	FunGen.write('FREQ ' + str(sampling_frequency))
 	FunGen.write('TERM FRONT') # Connect the output to the front panel terminal (i.e. enable output).
 	FunGen.write('PHSYNC') # Synchronize channels.
-	# Launch measurements ----------------------------------------------
-	FunGen.write('USE CHANB') # Select channel B to receive subsequent commands.
-	FunGen.write('SYNCOUT TB0') # Route SYNC signal to TB0 port in the rear panel. This signal is the one that generates the "sample event" for the voltmeters.
 	# Configure DMM ----------------------------------------------------
 	if verbose:
 		print('Configuring DMMs...')
@@ -80,10 +78,13 @@ def measure_burst(FunGen=None, DMM=None, generator_frequency=100, generator_ampl
 		DMM[k].write('SLOPE POS')
 		DMM[k].write('LEVEL 0')
 		DMM[k].write('TARM AUTO')
-	tm.sleep(3/generator_frequency) # This is in order to ensure the TRIG event or each voltmeter has already occured.
+	tm.sleep(3/generator_frequency) # This is in order to ensure the TRIG event for each voltmeter has already occured.
 	time_per_burst = number_of_samples/sampling_frequency
 	if verbose:
 		print('Measuring... ({:.2g}'.format(time_per_burst*N_BURSTS) + ' seconds)')
+	# Launch measurements ----------------------------------------------
+	FunGen.write('USE CHANB') # Select channel B to receive subsequent commands.
+	FunGen.write('SYNCOUT TB0') # Route SYNC signal to TB0 port in the rear panel. This signal is the one that generates the "sample event" for the voltmeters.
 	tm.sleep(time_per_burst*N_bursts) # Wait untill all burst have been taken.
 	if verbose:
 		print('Finishing measurements...')
