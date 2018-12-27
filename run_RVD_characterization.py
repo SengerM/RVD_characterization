@@ -5,9 +5,9 @@ from time import sleep
 import directories as DIRS
 
 N_SIMULTANEOUS_PROCESSING_THREADS = 4
-N_MEASUREMENT_RUNS = 1
+N_MEASUREMENT_RUNS = 20
 
-def call_processing_script():
+def process():
 	print('Calling "process_data.py"')
 	os.system("python process_data.py")
 
@@ -26,12 +26,16 @@ def process_data(measuring_thread):
 	while measuring_thread.isAlive() is True or len(os.listdir(DIRS.UNPROCESSED_DATA_PATH)) > 0:
 		if len(os.listdir(DIRS.UNPROCESSED_DATA_PATH)) > 0: # This means there is data awaiting to be processed.
 			if len(processing_threads) < N_SIMULTANEOUS_PROCESSING_THREADS:
-				processing_threads.append(threading.Thread(target=call_processing_script))
+				print('Calling "fix_trigger_problem.py"')
+				os.system("python fix_trigger_problem.py")
+				processing_threads.append(threading.Thread(target=process))
 				processing_threads[-1].start()
 			else:
 				for k in range(len(processing_threads)):
 					if processing_threads[k].isAlive() is False: # This means that this thread is available to process new data.
-						processing_threads[k] = threading.Thread(target=call_processing_script)
+						print('Calling "fix_trigger_problem.py"')
+						os.system("python fix_trigger_problem.py")
+						processing_threads[k] = threading.Thread(target=process)
 						processing_threads[k].start()
 					sleep(1) # This is to avoid two threads tying to process the same data.
 		sleep(1)
@@ -42,6 +46,7 @@ def process_data(measuring_thread):
 		if len(processing_threads) == 0:
 			print('Thread: ' + threading.current_thread().getName() + ' --> Processing finished')
 			return
+# ----------------------------------------------------------------------
 
 measuring_thread = threading.Thread(target=measure, name='measuring', args=(N_MEASUREMENT_RUNS,))
 data_processing_thread = threading.Thread(target=process_data, name='data processing', args=(measuring_thread,))
@@ -54,5 +59,5 @@ while data_processing_thread.isAlive() is True:
 print('Processing transference data...')
 os.system("python plot_transference.py")
 
-sleep(1000)
-os.system('shutdown -s')
+# ~ sleep(1000)
+# ~ os.system('shutdown -s')
