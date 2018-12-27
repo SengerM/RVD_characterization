@@ -37,18 +37,13 @@ for k in range(len(temp)):
 	temp[k] = temp[k]/temp[k].max()
 
 previous_std = (temp[0] - temp[1]).std()
-k = 0
 while True:
-	print(k)
-	k = k +1 
 	if previous_std > shift_and_std(temp[0], temp[1]):
-		print('a')
 		temp[0], temp[1] = shift_arrays(temp[0], temp[1])
 		previous_std = (temp[0] - temp[1]).std()
 		samples[0], samples[1] = shift_arrays(samples[0], samples[1])
 		continue
 	elif previous_std > shift_and_std(temp[1], temp[0]):
-		print('b')
 		temp[1], temp[0] = shift_arrays(temp[1], temp[0])
 		previous_std = (temp[0] - temp[1]).std()
 		samples[1], samples[0] = shift_arrays(samples[1], samples[0])
