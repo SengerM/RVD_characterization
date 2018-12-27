@@ -13,9 +13,7 @@ def shift_arrays(a, b):
 	a,b --> one dimension arrays
 	'a' is shifted left and 'b' is shifted right.
 	"""
-	a = a[:-1]
-	b = b[1:]
-	return a, b
+	return a[:-1], b[1:]
 
 # ----------------------------------------------------------------------
 if not os.path.isdir(DIRS.UNPROCESSED_DATA_PATH):
@@ -34,20 +32,27 @@ samples = np.transpose(samples)
 temp = [None]*len(samples)
 for k in range(len(samples)):
 	temp[k] = np.array(samples[k])
-samples = temp
+samples = temp.copy()
 for k in range(len(temp)):
 	temp[k] = temp[k]/temp[k].max()
 
 previous_std = (temp[0] - temp[1]).std()
+k = 0
 while True:
+	print(k)
+	k = k +1 
 	if previous_std > shift_and_std(temp[0], temp[1]):
+		print('a')
 		temp[0], temp[1] = shift_arrays(temp[0], temp[1])
 		previous_std = (temp[0] - temp[1]).std()
 		samples[0], samples[1] = shift_arrays(samples[0], samples[1])
+		continue
 	elif previous_std > shift_and_std(temp[1], temp[0]):
+		print('b')
 		temp[1], temp[0] = shift_arrays(temp[1], temp[0])
-		previous_std = (temp[1] - temp[0]).std()
+		previous_std = (temp[0] - temp[1]).std()
 		samples[1], samples[0] = shift_arrays(samples[1], samples[0])
+		continue
 	else:
 		break
 
@@ -57,3 +62,4 @@ with open(DIRS.TRIGGER_PROBLEM_FIXED_DATA_PATH + current_timestamp + DIRS.SAMPLE
 		print(str(samples[0][k]) + '\t' + str(samples[1][k]), file=ofile)
 os.rename(DIRS.UNPROCESSED_DATA_PATH + current_timestamp + DIRS.CONFIG_FILE_SUFFIX, DIRS.TRIGGER_PROBLEM_FIXED_DATA_PATH + current_timestamp + DIRS.CONFIG_FILE_SUFFIX)
 os.remove(DIRS.UNPROCESSED_DATA_PATH + current_timestamp + DIRS.SAMPLES_FILE_SUFFIX)
+
