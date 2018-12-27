@@ -5,7 +5,7 @@ from time import sleep
 import directories as DIRS
 
 N_SIMULTANEOUS_PROCESSING_THREADS = 4
-N_MEASUREMENT_RUNS = 10
+N_MEASUREMENT_RUNS = 1
 
 def call_processing_script():
 	print('Calling "process_data.py"')
@@ -54,4 +54,5 @@ while data_processing_thread.isAlive() is True:
 print('Processing transference data...')
 os.system("python plot_transference.py")
 
-
+sleep(1000)
+os.system('shutdown -s')

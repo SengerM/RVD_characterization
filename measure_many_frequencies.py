@@ -76,11 +76,6 @@ def measure_burst(FunGen=None, DMM=None, generator_frequency=100, generator_ampl
 	FunGen.write('FREQ ' + str(sampling_frequency))
 	FunGen.write('TERM FRONT') # Connect the output to the front panel terminal (i.e. enable output).
 	FunGen.write('PHSYNC') # Synchronize channels.
-	# Launch measurements ----------------------------------------------
-	# Note: This should be placed after the configuration of the DMMs. 
-	# However in that case the measurements fail, I don't know why...
-	FunGen.write('USE CHANB') # Select channel B to receive subsequent commands.
-	FunGen.write('SYNCOUT TB0') # Route SYNC signal to TB0 port in the rear panel. This signal is the one that generates the "sample event" for the voltmeters.
 	# Configure DMM ----------------------------------------------------
 	if verbose:
 		print('Configuring DMMs...')
@@ -103,6 +98,9 @@ def measure_burst(FunGen=None, DMM=None, generator_frequency=100, generator_ampl
 	time_per_burst = number_of_samples/sampling_frequency
 	if verbose:
 		print('Measuring... ({:.2g}'.format(time_per_burst*N_BURSTS) + ' seconds)')
+	# Launch measurements ----------------------------------------------
+	FunGen.write('USE CHANB') # Select channel B to receive subsequent commands.
+	FunGen.write('SYNCOUT TB0') # Route SYNC signal to TB0 port in the rear panel. This signal is the one that generates the "sample event" for the voltmeters.
 	tm.sleep(time_per_burst*N_bursts) # Wait untill all burst have been taken.
 	if verbose:
 		print('Finishing measurements...')

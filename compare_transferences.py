@@ -11,6 +11,7 @@ MEASUREMENTS_TO_COMPARE = [
 	# ~ '../RVD_measurements/181226A',
 	'../RVD_measurements/181226B',
 	'../RVD_measurements/181226C',
+	'../RVD_measurements/181226D',
 	]
 LABELS = [
 	'181220C',
@@ -18,6 +19,7 @@ LABELS = [
 	'181221B',
 	# ~ '181226A',
 	'181226B',
+	'181226C',
 	'181226C',
 	]
 

@@ -10,17 +10,17 @@ import directories as DIRS
 import utils.my_uncertainties_utils as munc
 
 # -----------------------------------------
-if not os.path.isdir(DIRS.UNPROCESSED_DATA_PATH):
+if not os.path.isdir(DIRS.TRIGGER_PROBLEM_FIXED_DATA_PATH):
 	print('No data to be analized.')
 	exit()
-if len(os.listdir(DIRS.UNPROCESSED_DATA_PATH)) == 0:
+if len(os.listdir(DIRS.TRIGGER_PROBLEM_FIXED_DATA_PATH)) == 0:
 	print('No data to be analized.')
 	exit()
-current_timestamp = os.listdir(DIRS.UNPROCESSED_DATA_PATH)[0] # This is the file to be analyzed.
+current_timestamp = os.listdir(DIRS.TRIGGER_PROBLEM_FIXED_DATA_PATH)[0] # This is the file to be analyzed.
 current_timestamp = current_timestamp[:current_timestamp.find('_')]
 print('Moving timestamp "' + current_timestamp + '" to "' + DIRS.CURRENTLY_PROCESSING_DATA_PATH + '"')
-os.rename(DIRS.UNPROCESSED_DATA_PATH + current_timestamp + DIRS.CONFIG_FILE_SUFFIX, DIRS.CURRENTLY_PROCESSING_DATA_PATH + current_timestamp + DIRS.CONFIG_FILE_SUFFIX)
-os.rename(DIRS.UNPROCESSED_DATA_PATH + current_timestamp + DIRS.SAMPLES_FILE_SUFFIX, DIRS.CURRENTLY_PROCESSING_DATA_PATH + current_timestamp + DIRS.SAMPLES_FILE_SUFFIX)
+os.rename(DIRS.TRIGGER_PROBLEM_FIXED_DATA_PATH + current_timestamp + DIRS.CONFIG_FILE_SUFFIX, DIRS.CURRENTLY_PROCESSING_DATA_PATH + current_timestamp + DIRS.CONFIG_FILE_SUFFIX)
+os.rename(DIRS.TRIGGER_PROBLEM_FIXED_DATA_PATH + current_timestamp + DIRS.SAMPLES_FILE_SUFFIX, DIRS.CURRENTLY_PROCESSING_DATA_PATH + current_timestamp + DIRS.SAMPLES_FILE_SUFFIX)
 # Read data -------------------------------
 print('Processing file with timestamp ' + current_timestamp)
 samples = np.genfromtxt(DIRS.CURRENTLY_PROCESSING_DATA_PATH + current_timestamp + DIRS.SAMPLES_FILE_SUFFIX, skip_header=1)
@@ -44,8 +44,9 @@ for k in range(2):
 	fig = discrete_time_model[k].plot_model_vs_data(xlabel='Sample number', ylabel='Voltage (V)', nicebox=True, marker='.')
 	fig.axes[-1].set_xlim([0, 10*sampling_frequency/2/np.pi/generator_frequency])
 # Transference calculation ---------------
-T_abs = np.abs(discrete_time_model[1].param_val(0)/discrete_time_model[0].param_val(0)) # The "abs" is because sometimes the fitting process converges to a negative amplitude.
+T_abs = discrete_time_model[1].param_val(0)/discrete_time_model[0].param_val(0)
 T_phi = utils.lock_in_process.lock_in_process(samples[0], samples[1])
+T_abs = np.abs(T_abs) # This is because sometimes the fitting algorithm converges to a negative amplitude.
 # Save data ------------------------------
 os.rename(DIRS.CURRENTLY_PROCESSING_DATA_PATH + current_timestamp + DIRS.CONFIG_FILE_SUFFIX, DIRS.PROCESSED_DATA_PATH + current_timestamp + DIRS.CONFIG_FILE_SUFFIX)
 os.rename(DIRS.CURRENTLY_PROCESSING_DATA_PATH + current_timestamp + DIRS.SAMPLES_FILE_SUFFIX, DIRS.PROCESSED_DATA_PATH + current_timestamp + DIRS.SAMPLES_FILE_SUFFIX)
