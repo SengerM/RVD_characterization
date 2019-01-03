@@ -14,9 +14,9 @@ def generate_timestamp():
 	
 	Example
 	-------	
-	>>> get_timestamp()
+	>>> generate_timestamp()
 	'20181013234913378084'
-	>>> [get_timestamp(), get_timestamp()]
+	>>> [generate_timestamp(), generate_timestamp()]
 	['20181013235501158401', '20181013235501158583']
 	"""
 	timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')

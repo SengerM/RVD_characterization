@@ -8,16 +8,14 @@ import nicenquickplotlib as nq # https://github.com/SengerM/nicenquickplotlib
 
 import utils.HP3458A as HP3458A
 import utils.fitmodel as fitmodel
-import directories as DIRS
-import utils.timestamp
 
 # Script parameters ----------------------------------------------------
 RESET_INSTRUMENTS = True
 # MEASURING PARAMS -----------------------------------------------------
-GENERATOR_FREQUENCIES = np.logspace(np.log10(40), np.log10(100000), 20)
+GENERATOR_FREQUENCIES = np.logspace(np.log10(40), np.log10(100000), 2)
 GENERATOR_AMPLITUDE = 10 # Peak voltage.
 DIVIDER_RATIO = 1/10
-N_READINGS_PER_FREQUENCY = 10
+N_READINGS_PER_FREQUENCY = 2
 # Open instruments -----------------------------------------------------
 print('Opening instruments...')
 rm = visa.ResourceManager()
@@ -105,7 +103,8 @@ nq.plot(
 	xlabel = 'Frequency (Hz)',
 	ylabel = 'Voltage (V)',
 	marker = '.',
-	xscale = 'L')
+	xscale = 'L',
+	title = 'Signals')
 nq.plot(
 	x = GENERATOR_FREQUENCIES,
 	y = [output_value/input_value, unp.std_devs(output_value/input_value)/unp.nominal_values(output_value/input_value)*1e6],
@@ -113,6 +112,8 @@ nq.plot(
 	xlabel = 'Frequency (Hz)',
 	ylabel = ['Ratio', 'Error (ppm)'],
 	marker = '.',
-	xscale = 'L')
-nq.show()
+	xscale = 'L',
+	title = 'Transference')
+
 nq.save_all(timestamp=True, csv=True)
+nq.show()
