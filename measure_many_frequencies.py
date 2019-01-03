@@ -14,7 +14,8 @@ import utils.timestamp
 # Script parameters ----------------------------------------------------
 RESET_INSTRUMENTS = False
 # MEASURING PARAMS -----------------------------------------------------
-GENERATOR_FREQUENCIES = [40, 100, 400, 1000, 4000, 10000, 40000, 100000]
+GENERATOR_FREQUENCIES = np.logspace(np.log10(40), np.log10(100000), 20)#[40, 100, 400, 1000, 4000, 10000, 40000, 100000]
+GENERATOR_FREQUENCIES = GENERATOR_FREQUENCIES[::-1] # This reverses the list. This makes the measurement and processing algorithm to go faster.
 SAMPLING_FREQUENCIES =  [i*10 for i in GENERATOR_FREQUENCIES]
 SAMPLES_PER_BURST = 10200 # Number of samples to be recorded.
 GENERATOR_AMPLITUDE = 10 # Peak voltage.
